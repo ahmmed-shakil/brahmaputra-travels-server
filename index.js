@@ -42,6 +42,23 @@ async function run() {
             const tour = await tourCollection.findOne(query);
             res.json(tour);
         })
+        // GET SINGLE ORDER API
+        app.get('/orders/:email', async (req, res) => {
+            const email = req.params.email;
+            console.log(email)
+            const query = { email: email }
+            const result = await orderCollection.find(query).toArray();
+            res.json(result);
+        })
+
+        app.get('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await orderCollection.findOne(query);
+            res.json(result)
+        })
+
+
 
         // POST API
         app.post('/tours', async (req, res) => {
@@ -54,6 +71,30 @@ async function run() {
         app.post('/orders', async (req, res) => {
             const order = req.body;
             const result = await orderCollection.insertOne(order);
+            res.json(result);
+        })
+
+        // DELETE API
+        app.delete('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            console.log(query)
+            const result = await orderCollection.deleteOne(query);
+            res.json(result);
+        })
+
+        // UPDATE API
+        app.put('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedOrder = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    status: updatedOrder.status
+                }
+            }
+            const result = await orderCollection.updateOne(filter, updateDoc, options);
             res.json(result);
         })
     }
